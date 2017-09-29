@@ -1,8 +1,6 @@
 #lang racket
 (define (mpair-iterator-stop? link) (or (not (mpair? link)) (null? link)))
 
-;(define (make-node left right) (mcons left right))
-
 (define (append-linkedlist list1 list2)
   (if (mpair? list1)
       (mcons (mcar list1) (append-linkedlist (mcdr list1) list2))
