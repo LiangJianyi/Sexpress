@@ -64,11 +64,18 @@
                     (f (mcdr linkedlist) (+ i 1))))))
     (f linkedlist 0)))
 
-;(define (contents? arg) ())
-
 (define (find-node? linkedlist arg)
   (if (equal? linkedlist arg)
       #t
       (if (mpair-iterator-stop? arg)
           #f
           (find-node? (mcdr linkedlist) arg))))
+
+(define (linkedlist-reverse lik)
+  (define (f lik rev)
+    (if (mpair-iterator-stop? lik)
+        (if (null? lik)
+            rev
+            (append-linkedlist lik rev))
+        (f (mcdr lik) (append-linkedlist (mcar lik) rev))))
+  (f lik null))
