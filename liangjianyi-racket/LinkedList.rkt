@@ -1,4 +1,15 @@
 #lang racket
+(provide append-linkedlist)
+(provide prepend-linkedlist)
+(provide make-linkedlist)
+(provide string->linkedlist)
+(provide iterator-linkedlist)
+(provide linkedlist-length)
+(provide linkedlist-ref)
+(provide find-node?)
+(provide linkedlist-reverse)
+(provide set-mcar-by-ref!)
+
 (define (mpair-iterator-stop? link) (or (not (mpair? link)) (null? link)))
 
 (define (append-linkedlist list1 list2)
@@ -89,5 +100,3 @@
                             (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node (mcdr lik)))))
                         (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons (mcar lik) null))))))))
     (f 0 lik null)))
-
-;(eval (define abc -1))
