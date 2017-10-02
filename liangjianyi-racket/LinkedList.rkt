@@ -44,30 +44,30 @@
         (iterator-linkedtree (mcdr tree) proc))
       (proc tree)))
 
-(define (iterator-linkedlist linkedlist proc)
-  (proc linkedlist)
-  (cond [[mpair? linkedlist] (iterator-linkedlist (mcdr linkedlist) proc)]))
+(define (iterator-linkedlist lik proc)
+  (proc lik)
+  (cond [[mpair? lik] (iterator-linkedlist (mcdr lik) proc)]))
 
-(define (linkedlist-length linkedlist)
+(define (linkedlist-length lik)
   (letrec ((length 0)
            (f (lambda (linkedlist)
                 (cond [[mpair? linkedlist] (set! length (+ length 1)) (f (mcdr linkedlist))]
                       [else length]))))
-    (f linkedlist)))
+    (f lik)))
 
-(define (linkedlist-ref linkedlist k)
+(define (linkedlist-ref lik k)
   (letrec ((f (lambda (linkedlist i)
                 (if (= i k)
                     (mcar linkedlist)
                     (f (mcdr linkedlist) (+ i 1))))))
-    (f linkedlist 0)))
+    (f lik 0)))
 
-(define (find-node? linkedlist arg)
-  (if (equal? linkedlist arg)
+(define (find-node? lik arg)
+  (if (equal? lik arg)
       #t
       (if (mpair-iterator-stop? arg)
           #f
-          (find-node? (mcdr linkedlist) arg))))
+          (find-node? (mcdr lik) arg))))
 
 (define (linkedlist-reverse lik)
   (define (f lik rev)
@@ -77,3 +77,17 @@
             (append-linkedlist lik rev))
         (f (mcdr lik) (append-linkedlist (mcar lik) rev))))
   (f lik null))
+
+(define (set-mcar-by-ref! lik ref node)
+  (letrec ((n (linkedlist-length lik))
+           (f (lambda (i lik aux)
+                (if (= i n)
+                    aux
+                    (if (= i ref)
+                        (if (null? (mcdr lik))
+                            (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node null)))
+                            (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node (mcdr lik)))))
+                        (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons (mcar lik) null))))))))
+    (f 0 lik null)))
+
+;(eval (define abc -1))
