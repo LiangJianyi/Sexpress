@@ -9,6 +9,11 @@
 (provide find-node?)
 (provide linkedlist-reverse)
 (provide set-mcar-by-ref!)
+;(provide set-mcar-by-mcar!)
+;(provide remove-node-by-ref!)
+;(provide remove-node-by-value!)
+(provide list->linkedlist)
+(provide linkedlist->vector)
 
 (define (mpair-iterator-stop? link) (or (not (mpair? link)) (null? link)))
 
@@ -100,3 +105,17 @@
                             (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node (mcdr lik)))))
                         (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons (mcar lik) null))))))))
     (f 0 lik null)))
+
+(define (list->linkedlist list)
+  (letrec ((f (lambda (list lik)
+                (if (null? list)
+                    lik
+                    (f (cdr list) (append-linkedlist lik (car list)))))))
+    (f list null)))
+
+(define (linkedlist->vector lik)
+  (letrec ((vec (make-vector (linkedlist-length lik)))
+           (f (lambda (lik i) [cond [[not (null? lik)]
+                                     (vector-set! vec i (mcar lik))
+                                     (f (mcdr lik) (+ i 1))]])))
+    (f lik 0)))
