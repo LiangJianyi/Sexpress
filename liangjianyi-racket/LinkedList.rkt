@@ -2,7 +2,7 @@
 (provide append-linkedlist)
 (provide prepend-linkedlist)
 (provide make-linkedlist)
-;(provide string->linkedlist)
+(provide string->linkedlist)
 ;(provide iterator-linkedlist)
 (provide linkedlist-length)
 (provide linkedlist-ref)
