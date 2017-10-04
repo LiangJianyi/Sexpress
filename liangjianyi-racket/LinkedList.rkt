@@ -1,7 +1,7 @@
 #lang racket
 (provide append-linkedlist)
 (provide prepend-linkedlist)
-;(provide make-linkedlist)
+(provide make-linkedlist)
 ;(provide string->linkedlist)
 ;(provide iterator-linkedlist)
 (provide linkedlist-length)
@@ -27,12 +27,16 @@
       list1
       (mcons (mcar list2) (prepend-linkedlist list1 (mcdr list2)))))
 
-(define (make-linkedlist length)
-  (letrec ((f (lambda (incre lik)
+(define (make-linkedlist length . fill)
+  (letrec ((f (lambda (incre [lik null])
                 (if (> incre length)
                     lik
-                    (f (+ incre 1) (append-linkedlist lik (mcons null null)))))))
-    (f 0 null)))
+                    (if (= incre 0)
+                        (f (+ incre 1))
+                        (if (null? fill)
+                            (f (+ incre 1) (append-linkedlist lik (mcons null null)))
+                            (f (+ incre 1) (append-linkedlist lik (mcons (car fill) null)))))))))
+    (f 0)))
 
 (define (string->linkedlist s)
   (letrec ((s-length (string-length s))
