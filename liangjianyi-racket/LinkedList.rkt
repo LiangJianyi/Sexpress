@@ -6,7 +6,7 @@
 ;(provide iterator-linkedlist)
 (provide linkedlist-length)
 (provide linkedlist-ref)
-;(provide find-node?)
+(provide find-node?)
 ;(provide linkedlist-reverse)
 ;(provide set-mcar-by-ref!)
 ;(provide set-mcar-by-mcar!)
