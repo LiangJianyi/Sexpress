@@ -14,6 +14,7 @@
 ;(provide remove-node-by-value!)
 (provide list->linkedlist)
 (provide linkedlist->vector)
+(provide linkedlist->string)
 
 (define (mpair-iterator-stop? link) (or (not (mpair? link)) (null? link)))
 
@@ -45,8 +46,8 @@
                      (if (= i s-length)
                          linkedlist
                          (begin
-                               (set! linkedlist (append-linkedlist linkedlist (mcons (string-ref s i) null)))
-                               (conver (+ i 1)))
+                           (set! linkedlist (append-linkedlist linkedlist (mcons (string-ref s i) null)))
+                           (conver (+ i 1)))
                          ))))
     (conver 0)))
 
@@ -116,3 +117,16 @@
                                      (vector-set! vec i (mcar lik))
                                      (f (mcdr lik) (+ i 1))]])))
     (f lik 0)))
+
+(define (linkedlist->string lik)
+  (letrec (;(string->char (lambda (s) ()))
+           (f (lambda (lik str)
+                (if (null? lik)
+                    str
+                    (begin
+                      [cond [[char? (mcar lik)] (f (mcdr lik) (string-append str (make-string 1 (mcar lik))))]
+                            [[string? (mcar lik)] (f (mcdr lik) (string-append str (mcar lik)))]
+                            [[number? (mcar lik)] (f (mcdr lik) (string-append str (number->string (mcar lik))))]
+                            [[symbol? (mcar lik)](f (mcdr lik) (string-append str (symbol->string (mcar lik))))]]
+                    )))))
+    (f lik "")))
