@@ -3,6 +3,7 @@
 (provide append-binarytree)
 (provide iterator-binarytree)
 (provide clone-binarytree)
+(provide reverse-binarytree)
 
 (define (make-binarytree deep [fill null])
   (if (= deep 0)
@@ -36,3 +37,10 @@
                     (mcons (f (mcar tree)) (f (mcdr tree)))
                     tree))])
     (f tree)))
+
+
+(define (reverse-binarytree tree)
+  (when (mpair? tree)
+    (if (and [mpair? [mcar tree]] [mpair? [mcdr tree]])
+        (mcons [reverse-binarytree (mcdr tree)] [reverse-binarytree (mcar tree)])
+        (mcons [mcdr tree] [mcar tree]))))
