@@ -84,13 +84,9 @@
           (find-node? (mcdr lik) arg))))
 
 (define (linkedlist-reverse lik)
-  (define (f lik rev)
-    (if (mpair-iterator-stop? lik)
-        (if (null? lik)
-            rev
-            (append-linkedlist lik rev))
-        (f (mcdr lik) (append-linkedlist (mcar lik) rev))))
-  (f lik null))
+  (if (null? [mcdr lik])
+      (mcons [mcar lik] null)
+      (prepend-linkedlist (mcons [mcar lik] null) (linkedlist-reverse [mcdr lik]))))
 
 (define (set-mcar-by-ref! lik ref node)
   (letrec ((n (linkedlist-length lik))
