@@ -32,11 +32,9 @@
 
 
 (define (clone-binarytree tree)
-  (letrec ([f (lambda (tree)
-                (if (mpair? tree)
-                    (mcons (f (mcar tree)) (f (mcdr tree)))
-                    tree))])
-    (f tree)))
+  (if (mpair? tree)
+      (mcons (clone-binarytree (mcar tree)) (clone-binarytree (mcdr tree)))
+      tree))
 
 
 (define (reverse-binarytree tree)
