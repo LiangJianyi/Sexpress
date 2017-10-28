@@ -8,7 +8,7 @@
 (provide linkedlist-ref)
 (provide find-node?)
 (provide linkedlist-reverse)
-;(provide set-mcar-by-ref!)
+(provide set-mcar-by-ref!)
 ;(provide set-mcar-by-mcar!)
 ;(provide remove-node-by-ref!)
 ;(provide remove-node-by-value!)
@@ -90,14 +90,14 @@
 
 (define (set-mcar-by-ref! lik ref node)
   (letrec ((n (linkedlist-length lik))
-           (f (lambda (i lik aux)
-                (if (= i n)
-                    aux
-                    (if (= i ref)
-                        (if (null? (mcdr lik))
-                            (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node null)))
-                            (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons node (mcdr lik)))))
-                        (f (+ i 1) (mcdr lik) (append-linkedlist aux (mcons (mcar lik) null))))))))
+           (temp null)
+           (f (lambda (i k aux)
+                (if (= i ref)
+                    (begin
+                      (set! temp [append-linkedlist aux (mcons node [mcdr k])])
+                      (set-mcar! lik (mcar temp))
+                      (set-mcdr! lik (mcdr temp)))
+                    (f (+ i 1) (mcdr k) (append-linkedlist aux (mcons (mcar k) null)))))))
     (f 0 lik null)))
 
 (define (list->linkedlist list)
@@ -126,5 +126,5 @@
                             [[string? (mcar lik)] (f (mcdr lik) (string-append str (mcar lik)))]
                             [[number? (mcar lik)] (f (mcdr lik) (string-append str (number->string (mcar lik))))]
                             [[symbol? (mcar lik)](f (mcdr lik) (string-append str (symbol->string (mcar lik))))]]
-                    )))))
+                      )))))
     (f lik "")))
