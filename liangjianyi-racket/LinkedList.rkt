@@ -11,7 +11,7 @@
 (provide set-mcar-by-ref!)
 (provide set-mcar-by-value!)
 (provide remove-node-by-ref)
-;(provide remove-node-by-value)
+(provide remove-node-by-value)
 (provide list->linkedlist)
 (provide linkedlist->vector)
 (provide linkedlist->string)
@@ -124,6 +124,16 @@
                         (f [+ i 1] [mcdr k] aux)
                         (f [+ i 1] [mcdr k] [append-linkedlist aux (mcons [mcar k] null)]))))])
     (f 0 lik null)))
+
+
+(define (remove-node-by-value lik value)
+  (letrec ([f (lambda (k aux)
+                (if (mpair-iterator-stop? k)
+                    aux
+                    (if (equal? [mcar k] value)
+                        (f [mcdr k] aux)
+                        (f [mcdr k] [append-linkedlist aux (mcons [mcar k] null)]))))])
+    (f lik null)))
 
 
 (define (list->linkedlist list)
