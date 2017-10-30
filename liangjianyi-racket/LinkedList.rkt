@@ -9,7 +9,7 @@
 (provide find-node?)
 (provide linkedlist-reverse)
 (provide set-mcar-by-ref!)
-;(provide set-mcar-by-mcar!)
+(provide set-mcar-by-value!)
 ;(provide remove-node-by-ref!)
 ;(provide remove-node-by-value!)
 (provide list->linkedlist)
@@ -88,6 +88,7 @@
       (mcons [mcar lik] null)
       (prepend-linkedlist (mcons [mcar lik] null) (linkedlist-reverse [mcdr lik]))))
 
+
 (define (set-mcar-by-ref! lik ref node)
   (if (>= ref [linkedlist-length lik])
       (error "ref: out of range exception.")
@@ -101,6 +102,19 @@
                           (set-mcdr! lik (mcdr temp)))
                         (f (+ i 1) (mcdr k) (append-linkedlist aux (mcons (mcar k) null)))))))
         (f 0 lik null))))
+
+
+(define (set-mcar-by-value! lik value node)
+  (letrec ([f (lambda (k aux)
+                (if (mpair-iterator-stop? k)
+                    (begin
+                      (set-mcar! lik [mcar aux])
+                      (set-mcdr! lik [mcdr aux]))
+                    (if (equal? value (mcar k))
+                        (f [mcdr k] [append-linkedlist aux (mcons node null)])
+                        (f [mcdr k] [append-linkedlist aux (mcons (mcar k) null)]))))])
+    (f lik null)))
+
 
 (define (list->linkedlist list)
   (letrec ((f (lambda (list lik)
