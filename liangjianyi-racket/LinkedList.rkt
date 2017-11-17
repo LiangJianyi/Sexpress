@@ -3,7 +3,7 @@
 (provide prepend-linkedlist)
 (provide make-linkedlist)
 (provide string->linkedlist)
-;(provide iterator-linkedlist)
+(provide iterator-linkedlist)
 (provide linkedlist-length)
 (provide linkedlist-ref)
 (provide find-node?)
@@ -59,8 +59,7 @@
       (proc tree)))
 
 (define (iterator-linkedlist lik proc)
-  (proc lik)
-  (cond [[mpair? lik] (iterator-linkedlist (mcdr lik) proc)]))
+  (cond [[mpair? lik] (proc lik) (iterator-linkedlist (mcdr lik) proc)]))
 
 (define (linkedlist-length lik)
   (letrec ((length 0)
