@@ -10,6 +10,7 @@
 (provide linkedlist-reverse)
 (provide set-mcar-by-ref!)
 (provide set-mcar-by-value!)
+(provide get-element-by-value)
 (provide remove-node-by-ref)
 (provide remove-node-by-value)
 (provide list->linkedlist)
@@ -58,8 +59,18 @@
         (iterator-linkedtree (mcdr tree) proc))
       (proc tree)))
 
-(define (iterator-linkedlist lik proc)
-  (cond [[mpair? lik] (proc lik) (iterator-linkedlist (mcdr lik) proc)]))
+;;; lik: 链表
+;;; proc: 遍历每个节点所执行的过程（以节点为参数）
+;;; predicate-proc?: 用来检测当前遍历的节点是否符合终止条件的过程（以节点为参数，返回一个谓词表达式）
+(define (iterator-linkedlist lik proc [predicate-proc? null])
+  (when [mpair? lik]
+    (if [null? predicate-proc?]
+        (begin
+          (proc [mcar lik])
+          (iterator-linkedlist (mcdr lik) proc predicate-proc?))
+        (when [not [predicate-proc? [mcar lik]]]
+          (proc [mcar lik])
+          (iterator-linkedlist (mcdr lik) proc predicate-proc?)))))
 
 (define (linkedlist-length lik)
   (letrec ((length 0)
@@ -75,12 +86,18 @@
                     (f (mcdr linkedlist) (+ i 1))))))
     (f lik 0)))
 
-(define (find-node? lik arg)
-  (if (equal? lik arg)
-      #t
-      (if (mpair-iterator-stop? arg)
-          #f
-          (find-node? (mcdr lik) arg))))
+(define (find-node? lik arg [proc null])
+  (if [null? proc]
+      (if (equal? lik [proc arg])
+          #t
+          (if (mpair-iterator-stop? [proc arg])
+              #f
+              (find-node? (mcdr lik) [proc arg] proc)))
+      (if (equal? lik arg)
+          #t
+          (if (mpair-iterator-stop? arg)
+              #f
+              (find-node? (mcdr lik) arg)))))
 
 (define (linkedlist-reverse lik)
   (if (null? [mcdr lik])
@@ -113,6 +130,22 @@
                         (f [mcdr k] [append-linkedlist aux (mcons node null)])
                         (f [mcdr k] [append-linkedlist aux (mcons (mcar k) null)]))))])
     (f lik null)))
+
+;;; lik: 链表
+;;; value: 查找对象的参照物
+;;; proc: 对找到的对象进行额外的处理
+(define (get-element-by-value lik value [proc null])
+  (let ([targets null])
+    (if [null? proc]
+        (iterator-linkedlist lik (lambda (x)
+                                   (when [equal? x value]
+                                     (set! targets (append-linkedlist targets [mcons x null])))))
+        (iterator-linkedlist lik (lambda (x)
+                                   (when [equal? (proc x) value]
+                                     (set! targets (append-linkedlist targets [mcons x null]))))))
+    (if [null? targets]
+        (error "对象不存在: " value)
+        targets)))
 
 
 (define (remove-node-by-ref lik ref)
