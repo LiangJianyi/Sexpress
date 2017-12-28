@@ -29,6 +29,11 @@
       list1
       (mcons (mcar list2) (prepend-linkedlist list1 (mcdr list2)))))
 
+(define (linkedlist . members)
+  (if [null? members]
+      (error "Linkedlist not arguments.")
+      (list->linkedlist members)))
+
 (define (make-linkedlist length . fill)
   (letrec ((f (lambda (incre [lik null])
                 (if (> incre length)
@@ -134,6 +139,7 @@
 ;;; lik: 链表
 ;;; value: 查找对象的参照物
 ;;; proc: 对找到的对象进行额外的处理
+;;; 返回一个 mlist，里面包含了符合查找条件的对象，如果没有找到对象，则抛出异常
 (define (get-element-by-value lik value [proc null])
   (let ([targets null])
     (if [null? proc]
