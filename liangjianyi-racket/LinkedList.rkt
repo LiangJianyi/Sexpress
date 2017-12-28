@@ -1,6 +1,7 @@
 #lang racket
 (provide append-linkedlist)
 (provide prepend-linkedlist)
+(provide linkedlist)
 (provide make-linkedlist)
 (provide string->linkedlist)
 (provide iterator-linkedlist)
