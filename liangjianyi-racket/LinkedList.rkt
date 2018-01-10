@@ -93,17 +93,15 @@
     (f lik 0)))
 
 (define (find-node? lik arg [proc null])
-  (if [null? proc]
-      (if (equal? lik [proc arg])
-          #t
-          (if (mpair-iterator-stop? [proc arg])
-              #f
-              (find-node? (mcdr lik) [proc arg] proc)))
-      (if (equal? lik arg)
-          #t
-          (if (mpair-iterator-stop? arg)
-              #f
-              (find-node? (mcdr lik) arg)))))
+  (if [mpair-iterator-stop? lik]
+      false
+      (if [null? proc]
+          (if [equal? [mcar lik] arg]
+              true
+              (find-node? [mcdr lik] arg))
+          (if [equal? [mcar lik] (proc arg)]
+              true
+              (find-node? [mcdr lik] arg proc)))))
 
 (define (linkedlist-reverse lik)
   (if (null? [mcdr lik])
