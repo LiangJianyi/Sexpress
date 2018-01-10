@@ -31,10 +31,16 @@
     (iterator-binarytree (mcdr tree) proc)))
 
 
-(define (clone-binarytree tree)
-  (if (mpair? tree)
-      (mcons (clone-binarytree (mcar tree)) (clone-binarytree (mcdr tree)))
-      tree))
+(define (clone-binarytree tree [variant-option 'mutable])
+  (cond [[eq? variant-option 'mutable]
+         (if (mpair? tree)
+             (mcons (clone-binarytree (mcar tree)) (clone-binarytree (mcdr tree)))
+             tree)]
+        [[eq? variant-option 'immutable]
+         (if (pair? tree)
+             (cons (clone-binarytree (car tree) 'immutable) (clone-binarytree (cdr tree) 'immutable))
+             tree)]
+        [else (raise-argument-error 'variant-option "must be mutable or imutable" 1 variant-option)]))
 
 
 (define (reverse-binarytree tree)
