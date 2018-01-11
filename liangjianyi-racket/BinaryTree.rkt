@@ -7,6 +7,7 @@
 ;(provide set-value-by-value!)
 ;(provide set-value-by-node)
 ;(provide set-value-by-node!)
+(provide binarytree-map)
 (provide reverse-binarytree)
 
 (define (make-binarytree deep [fill null])
@@ -95,6 +96,31 @@
                                     target
                                     tree))])]
                [else (raise-argument-error 'variant-option "variant-option 只能是以下三种选项: 'mutable, 'immutable or 'both" 2 tree value target variant-option atom-proc)])]))
+
+; 传入一棵二叉树，经过缩放变换返回另一棵结构相同的二叉树
+; tree: 二叉树(数据源)
+; map: 表示缩放变换的过程
+; variant-option: 数据节点的易变性,该参数只有三个选项:mutable immutable both,全部用符号表示
+(define (binarytree-map tree map [variant-option 'mutable])
+  (cond [[eq? variant-option 'mutable]
+         (if (mpair? tree)
+             (mcons (binarytree-map [mcar tree] map variant-option)
+                    (binarytree-map [mcdr tree] map variant-option))
+             (map tree))]
+        [[eq? variant-option 'immutable]
+         (if (pair? tree)
+             (cons (binarytree-map [car tree] map variant-option)
+                   (binarytree-map [cdr tree] map variant-option))
+             (map tree))]
+        [[eq? variant-option 'both]
+         (cond [(mpair? tree)
+                (mcons (binarytree-map [mcar tree] map variant-option)
+                       (binarytree-map [mcdr tree] map variant-option))]
+               [(pair? tree)
+                (cons (binarytree-map [car tree] map variant-option)
+                      (binarytree-map [cdr tree] map variant-option))]
+               [else (map tree)])]
+        [else (raise-argument-error 'variant-option "variant-option 只能是以下三种选项: 'mutable, 'immutable or 'both" 2 tree map variant-option)]))
 
 
 (define (reverse-binarytree tree)
