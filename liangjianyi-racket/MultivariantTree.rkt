@@ -1,6 +1,6 @@
 #lang racket
 (provide make-tree)
-(provide append-multitree)
+(provide append-multitree!)
 
 (define (make-tree leaves depth . values)
   (define (f tree depth v)
@@ -18,15 +18,49 @@
                   (f null depth null)
                   (f null depth values))]))
 
-(define (append-multitree tree node)
-  (if (null? tree)
-      node
-      (cons (if (leaves? [car tree])
-                [car tree]
-                (append-multitree (car tree) node))
-            (append-multitree (cdr tree) node))))
+;;; 树中的每个节点坐标用一个由若干二维向量组成的矩阵表示
+;;; 二维向量的左值 x 代表当前深度 y 的列表的第 x 个元素
+;;; 二维向量的右值 y 代表左值 x 在整棵树中的深度
+(define (append-multitree! t n target
+                           [v #((vector 0 0))]
+                           [x 0]
+                           [y 0]
+                           [current-index 0]
+                           [next-index (+ current-index 1)])
+  (unless [>= current-index (- (vector-length target) 2)]
+    (cond [[and (null? t) (equal? v #((vector 0 0)))]
+           (set! t n)]
+          [[mpair? t]
+           (cond [[equal? (vector-ref v current-index) (vector-ref target current-index)]
+                  (cond [[> (vector-ref (vector-ref target next-index) 0) (vector-ref (vector-ref v current-index) 0)]
+                         (append-multitree! [mcar t] n target
+                                            (vector-append v #([+ x 1] y))
+                                            [+ x 1]
+                                            y
+                                            [+ current-index 1]
+                                            [+ next-index 1])]
+                        [[> (vector-ref (vector-ref target next-index) 1) (vector-ref (vector-ref v current-index) 1)]
+                         (append-multitree! [mcdr t] n target
+                                            (vector-append v #(x (+ y 1)))
+                                            x
+                                            [+ y 1]
+                                            [+ current-index 1]
+                                            [+ next-index 1])]
+                        [(raise-argument-error 'target "下一节点的坐标值必须大于上一个节点的坐标值" 2 t n target v x y current-index next-index)])]
+                 [else (raise-argument-error 'target "坐标值非法" 2 t n target v x y current-index next-index)])])))
 
 (define (leaves? node)
   (and [not [pair? node]] [not [null? node]]))
 
-(define (make-treenode value) (cons value null))
+(define (make-treenode value coord)
+  (cons
+   (lambda (dispatch) (cond [[eq? dispatch 'value] value]
+                            [[eq? dispatch 'coord] coord]
+                            [else (raise-argument-error 'dispatch "指令非法" 0 dispatch)]))
+   null))
+
+(define (make-coord x y)
+  (vector x y))
+
+(define (append-coord coord x y)
+  (append coord (make-coord x y)))
