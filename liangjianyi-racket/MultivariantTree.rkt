@@ -49,17 +49,3 @@
                         [(raise-argument-error 'coords "下一节点的坐标值必须大于上一个节点的坐标值" 2 t n coords v x y current-index next-index)])]
                  [else (raise-argument-error 'coords "坐标值非法" 2 t n coords v x y current-index next-index)])])))
 
-(define (leaves? node)
-  (and [not [pair? node]] [not [null? node]]))
-
-(define (make-coord x y)
-  (vector x y))
-
-(define (coord-x coords)
-  (vector-ref coords 0))
-
-(define (coord-y coords)
-  (vector-ref coords 1))
-
-(define (append-coord coord x y)
-  (vector-append coord (make-coord x y)))
