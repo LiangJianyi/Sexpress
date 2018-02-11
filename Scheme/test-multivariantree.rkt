@@ -49,5 +49,11 @@
                       (vector 2 1)
                       (vector 2 2)))
 (append-multitree! tree (mcons -1 null) coord)
-tree
 (mcdr (mcdr (mcdr (mcar (mcar tree)))))
+(append-multitree! tree (linkedlist 'fuck) (vector [vector-ref coord 0]))
+(mcdr tree)
+(append-multitree! tree (linkedlist 'FUCK) (vector (vector 0 0)
+                                                   (vector 0 1)))
+(mcdr (mcdr tree))
+
+tree
