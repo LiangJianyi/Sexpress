@@ -17,7 +17,7 @@
 ;                           [y 0]
 ;                           [current-index 0]
 ;                           [next-index (+ current-index 1)])
-;  (if [> current-index (- (vector-length coords) 2)]
+;  (if [<= current-index (- (vector-length coords) 2)]
 ;      (cond [[and (null? t) (equal? v (vector (vector 0 0)))]
 ;             (set! t n)]
 ;            [[mpair? t]
@@ -50,3 +50,4 @@
                       (vector 2 2)))
 (append-multitree! tree (mcons -1 null) coord)
 tree
+(mcdr (mcdr (mcdr (mcar (mcar tree)))))
