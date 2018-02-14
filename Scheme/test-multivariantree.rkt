@@ -55,5 +55,9 @@
 (append-multitree! tree (linkedlist 'FUCK) (vector (vector 0 0)
                                                    (vector 0 1)))
 (mcdr (mcdr tree))
+(append-multitree! tree (linkedlist 41234) (vector (vector 0 0)
+                                                   (vector 1 0)
+                                                   (vector 1 1)))
+(mcdr (mcdr (mcar tree)))
 
 tree
