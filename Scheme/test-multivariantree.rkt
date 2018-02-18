@@ -11,37 +11,54 @@
               (linkedlist (linkedlist "def" (linkedlist "f") "a")
                           (linkedlist "f"))))
 
-;(define (append-multitree! t n coords
-;                           [v (vector (vector 0 0))]
-;                           [x 0]
-;                           [y 0]
-;                           [current-index 0]
-;                           [next-index (+ current-index 1)])
-;  (if [<= current-index (- (vector-length coords) 2)]
-;      (cond [[and (null? t) (equal? v (vector (vector 0 0)))]
-;             (set! t n)]
-;            [[mpair? t]
-;             (cond [[equal? (vector-ref v current-index) (vector-ref coords current-index)]
-;                    ; 一定要先判断左值再判断右值
-;                    (cond [[> (vector-ref (vector-ref coords next-index) 0) (vector-ref (vector-ref v current-index) 0)]
-;                           (append-multitree! [mcar t] n coords
-;                                              (vector-append v (vector (vector [+ x 1] y)))
-;                                              [+ x 1]
-;                                              y
-;                                              [+ current-index 1]
-;                                              [+ next-index 1])]
-;                          [[> (vector-ref (vector-ref coords next-index) 1) (vector-ref (vector-ref v current-index) 1)]
-;                           (append-multitree! [mcdr t] n coords
-;                                              (vector-append v (vector (vector x (+ y 1))))
-;                                              x
-;                                              [+ y 1]
-;                                              [+ current-index 1]
-;                                              [+ next-index 1])]
-;                          [(raise-argument-error 'coords "下一节点的坐标值必须大于上一个节点的坐标值" 2 t n coords v x y current-index next-index)])]
-;                   [else (raise-argument-error 'coords "坐标值非法" 2 t n coords v x y current-index next-index)])])
-;      (if [null? (mcar t)]
-;          (set-mcar! t n)
-;          (set-mcdr! t n))))
+(define (get-car t flag)
+  (cond [[eq? flag 'mutable] (mcar t)]
+        [[eq? flag 'immutable] (car t)]
+        [[eq? flag 'both] (if [mpair? t] (mcar t) (car t))]
+        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
+
+(define (get-cdr t flag)
+  (cond [[eq? flag 'mutable] (mcdr t)]
+        [[eq? flag 'immutable] (cdr t)]
+        [[eq? flag 'both] (if [mpair? t] (mcdr t) (cdr t))]
+        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
+
+(define (pair-or-mpair? t flag)
+  (cond [[eq? flag 'mutable] (mpair? t)]
+        [[eq? flag 'immutable] (pair? t)]
+        [[eq? flag 'both] (or [mpair? t] [pair? t])]
+        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
+
+(define (iterator-multitree tree proc [flag 'mutable])
+  (if [and (pair-or-mpair? tree flag)
+           (procedure? proc)
+           (or [eq? flag 'mutable] [eq? flag 'immutable] [eq? flag 'both])]
+      (begin
+        (if [pair-or-mpair? (get-car tree flag) flag]
+            (iterator-multitree (get-car tree flag) proc flag)
+            (proc (get-car tree flag)))
+        (if [pair-or-mpair? (get-cdr tree flag) flag]
+            (iterator-multitree (get-cdr tree flag) proc flag)
+            (proc (get-cdr tree flag))))
+      (cond [[and (not (pair-or-mpair? tree flag))
+                  (not [procedure? proc])
+                  (not (or [eq? flag 'mutable] [eq? flag 'immutable]))]
+             (raise-arguments-error 'iterator-multitree
+                                    "tree 必须是一个序对 、 proc 必须是个可用的过程且 flag 必须是个有效符号"
+                                    "tree" tree
+                                    "proc" proc
+                                    "flag" flag)]
+            [[not (or [eq? flag 'mutable] [eq? flag 'immutable])]
+             (raise-argument-error 'iterator-multitree "flag 必须是一个有效的符号" 2 tree proc flag)]
+            [[not (pair-or-mpair? tree flag)]
+             (cond [[eq? flag 'mutable]
+                    (raise-argument-error 'iterator-multitree "tree 必须是一个 mpair" 0 tree proc flag)]
+                   [[eq? flag 'immutable]
+                    (raise-argument-error 'iterator-multitree "tree 必须是一个 pair" 0 tree proc flag)]
+                   [[eq? flag 'both]
+                    (raise-argument-error 'iterator-multitree "tree 必须是一个 pair 或 mpair" 0 tree proc flag)])]
+            [[not (procedure? proc)]
+             (raise-argument-error 'iterator-multitree "proc 必须是一个过程" 1 tree proc flag)])))
 
 (define coord (vector (vector 0 0)
                       (vector 1 0)
@@ -61,3 +78,4 @@
 (mcdr (mcdr (mcar tree)))
 
 tree
+(iterator-multitree tree displayln)
