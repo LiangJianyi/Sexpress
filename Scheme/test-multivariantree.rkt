@@ -11,24 +11,6 @@
               (linkedlist (linkedlist "def" (linkedlist "f") "a")
                           (linkedlist "f"))))
 
-(define (get-car t flag)
-  (cond [[eq? flag 'mutable] (mcar t)]
-        [[eq? flag 'immutable] (car t)]
-        [[eq? flag 'both] (if [mpair? t] (mcar t) (car t))]
-        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
-
-(define (get-cdr t flag)
-  (cond [[eq? flag 'mutable] (mcdr t)]
-        [[eq? flag 'immutable] (cdr t)]
-        [[eq? flag 'both] (if [mpair? t] (mcdr t) (cdr t))]
-        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
-
-(define (pair-or-mpair? t flag)
-  (cond [[eq? flag 'mutable] (mpair? t)]
-        [[eq? flag 'immutable] (pair? t)]
-        [[eq? flag 'both] (or [mpair? t] [pair? t])]
-        [else (raise-arguments-error 'get-pair "Invalid flag" "flag" flag)]))
-
 (define (iterator-multitree tree proc [flag 'mutable])
   (if [and (pair-or-mpair? tree flag)
            (procedure? proc)
@@ -60,12 +42,32 @@
             [[not (procedure? proc)]
              (raise-argument-error 'iterator-multitree "proc 必须是一个过程" 1 tree proc flag)])))
 
+(define (get-car t flag)
+  (cond [[eq? flag 'mutable] (mcar t)]
+        [[eq? flag 'immutable] (car t)]
+        [[eq? flag 'both] (if [mpair? t] (mcar t) (car t))]
+        [else (raise-arguments-error 'get-car? "Invalid flag" "flag" flag)]))
+
+(define (get-cdr t flag)
+  (cond [[eq? flag 'mutable] (mcdr t)]
+        [[eq? flag 'immutable] (cdr t)]
+        [[eq? flag 'both] (if [mpair? t] (mcdr t) (cdr t))]
+        [else (raise-arguments-error 'get-cdr? "Invalid flag" "flag" flag)]))
+
+(define (pair-or-mpair? t flag)
+  (cond [[eq? flag 'mutable] (mpair? t)]
+        [[eq? flag 'immutable] (pair? t)]
+        [[eq? flag 'both] (or [mpair? t] [pair? t])]
+        [else (raise-arguments-error 'pair-or-mpair? "Invalid flag" "flag" flag)]))
+
+'---------------------------------------------------------------------------------
+
 (define coord (vector (vector 0 0)
                       (vector 1 0)
                       (vector 2 0)
                       (vector 2 1)
                       (vector 2 2)))
-(append-multitree! tree (mcons -1 null) coord)
+(append-multitree! tree (linkedlist -1) coord)
 (mcdr (mcdr (mcdr (mcar (mcar tree)))))
 (append-multitree! tree (linkedlist 'fuck) (vector [vector-ref coord 0]))
 (mcdr tree)
@@ -79,3 +81,31 @@
 
 tree
 (iterator-multitree tree displayln)
+
+'---------------------------------------------------------------------------------
+(define t (mcons 1 (mcons 2 null)))
+(set-mcdr! (get-cdr t 'mutable) (mcons 'app null))
+t
+(set-mcdr! (get-cdr (get-cdr t 'mutable) 'mutable) (mcons 'app null))
+t
+(set-mcdr! (get-cdr (get-cdr (get-cdr t 'mutable) 'mutable) 'mutable) (mcons 'app null))
+t
+(set-mcdr! (get-cdr (get-cdr (get-cdr (get-cdr t 'mutable) 'mutable) 'mutable) 'mutable) (mcons 'app null))
+t
+
+
+(define (demo t)
+  (set-mcdr! t (linkedlist 2))
+  (displayln t)
+  ([lambda (t)
+     (set-mcdr! t (linkedlist 3))
+     (displayln t)
+     ([lambda (t)
+        (set-mcdr! t (linkedlist 4))
+        (displayln t)]
+      (mcdr t))]
+   (mcdr t)))
+
+(define fuck (linkedlist 1))
+(demo fuck)
+fuck
