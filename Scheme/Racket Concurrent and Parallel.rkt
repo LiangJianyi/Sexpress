@@ -37,7 +37,7 @@
 (custodian-box-value custbox)
 
 '------------------------
-(letrec [[get-random-number (lambda () (random -999999 99999))]
+(letrec [[get-random-number (lambda () (random -999 999))]
       [mlst (mlist 'start)]
       [f1 (lambda ()
             (do [[x 0 (get-random-number)]]
@@ -61,5 +61,32 @@
         [t4 (thread f4)]]
     (begin (sync t1 t2 t3 t4)
            mlst)))
+
+'-------------------------
+;(define ch (make-channel))
+;(thread (λ () (displayln (sync ch))))
+;(channel-put ch (lambda () (+ 1 2)))
+
+(thread (lambda () (displayln "This is a new thread.")))
+(thread (lambda () (displayln "This is another new thread.")))
+
+(define worker (thread (lambda ()
+                         (let loop ()
+                           (displayln "Working...")
+                           (sleep 0.2)
+                           (loop)))))
+
+;(do [[x 0 (random -9999 9)]]
+;  [[equal? x 1] (displayln x)]
+;  (displayln x))
+;(sleep 12.5)
+;(displayln "done")
+
+(let loop ([x 1]
+           [y 2]
+           [z 3])
+  (if [and (= x 100000) (= y 200000) (= z 300000)]
+      (+ x y z)
+      (loop (* x 10) (* y 10) (* z 10))))
 
 (custodian-shutdown-all cust)
