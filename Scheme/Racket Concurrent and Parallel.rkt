@@ -60,21 +60,30 @@
         [t3 (thread f3)]
         [t4 (thread f4)]]
     (begin (sync t1 t2 t3 t4)
-           mlst)))
+           mlst
+           (kill-thread t1)
+           (kill-thread t2)
+           (kill-thread t3)
+           (kill-thread t4))))
+
 
 '-------------------------
 ;(define ch (make-channel))
 ;(thread (λ () (displayln (sync ch))))
 ;(channel-put ch (lambda () (+ 1 2)))
 
-(thread (lambda () (displayln "This is a new thread.")))
-(thread (lambda () (displayln "This is another new thread.")))
+(define t5 (thread (lambda () (displayln "This is a new thread."))))
+(define t6 (thread (lambda () (displayln "This is another new thread."))))
 
 (define worker (thread (lambda ()
                          (let loop ()
                            (displayln "Working...")
                            (sleep 0.2)
                            (loop)))))
+
+(kill-thread t5)
+(kill-thread t6)
+(kill-thread worker)
 
 ;(do [[x 0 (random -9999 9)]]
 ;  [[equal? x 1] (displayln x)]
