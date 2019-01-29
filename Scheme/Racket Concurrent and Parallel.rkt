@@ -76,26 +76,25 @@
 (define t6 (thread (lambda () (displayln "This is another new thread."))))
 
 (define worker (thread (lambda ()
-                         (let loop ()
+                         (let loop ([x 0])
                            (displayln "Working...")
-                           (sleep 0.2)
-                           (loop)))))
+                           (if [= x 100]
+                               (begin (display (current-thread))
+                                      (displayln "is done.")
+                                      (kill-thread (current-thread)))
+                               (loop [+ x 1]))))))
 
 (kill-thread t5)
 (kill-thread t6)
-(kill-thread worker)
+(thread-wait worker)
+(if [thread-dead? worker]
+    (displayln "worker was dead.")
+    (kill-thread worker))
 
 ;(do [[x 0 (random -9999 9)]]
 ;  [[equal? x 1] (displayln x)]
 ;  (displayln x))
 ;(sleep 12.5)
 ;(displayln "done")
-
-(let loop ([x 1]
-           [y 2]
-           [z 3])
-  (if [and (= x 100000) (= y 200000) (= z 300000)]
-      (+ x y z)
-      (loop (* x 10) (* y 10) (* z 10))))
 
 (custodian-shutdown-all cust)
