@@ -110,11 +110,8 @@
            [t1 (thread func1)]
            [t2 (thread func2)]
            [t3 (thread func3)]]
-    (begin (do []
-             [(eq? (thread-running? t1) #f) (kill-thread t1)])
-           (do []
-             [(eq? (thread-running? t2) #f) (kill-thread t2)])
-           (do []
-             [(eq? (thread-running? t3) #f) (kill-thread t3)]))))
+    (begin (thread-wait t1)
+           (thread-wait t2)
+           (thread-wait t3))))
 
 (custodian-shutdown-all cust)
