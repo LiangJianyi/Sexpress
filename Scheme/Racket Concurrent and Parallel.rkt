@@ -77,8 +77,9 @@
 
 (define worker (thread (lambda ()
                          (let loop ([x 0])
-                           (displayln "Working...")
-                           (if [= x 100]
+                           (begin (display "Working with ")
+                                  (displayln x))
+                           (if [= x 10]
                                (begin (display (current-thread))
                                       (displayln "is done.")
                                       (kill-thread (current-thread)))
@@ -91,10 +92,24 @@
     (displayln "worker was dead.")
     (kill-thread worker))
 
-;(do [[x 0 (random -9999 9)]]
-;  [[equal? x 1] (displayln x)]
-;  (displayln x))
-;(sleep 12.5)
-;(displayln "done")
+'-------------------------
+(define (parallel-example)
+  (letrec [[x 0]
+           [func1 (lambda ()
+                    (fprintf (current-output-port) "~a value before execute func1 is ~a\n" "x" x)
+                    (set! x (+ x 1))
+                    (fprintf (current-output-port) "~a value after execute func1 is ~a\n" "x" x))]
+           [func2 (lambda ()
+                    (fprintf (current-output-port) "~a value before execute func2 is ~a\n" "x" x)
+                    (set! x (* x x))
+                    (fprintf (current-output-port) "~a value after execute func2 is ~a\n" "x" x))]
+           [func3 (lambda ()
+                    (fprintf (current-output-port) "~a value before execute func3 is ~a\n" "x" x)
+                    (set! x (+ x 0.2222))
+                    (fprintf (current-output-port) "~a value after execute func3 is ~a\n" "x" x))]
+           [t1 (thread func1)]
+           [t2 (thread func2)]
+           [t3 (thread func3)]]
+    (begin 'Done)))
 
 (custodian-shutdown-all cust)
