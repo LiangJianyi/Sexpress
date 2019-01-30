@@ -106,12 +106,18 @@
            [func3 (lambda ()
                     (fprintf (current-output-port) "~a value before execute func3 is ~a\n" "x" x)
                     (set! x (+ x 0.2222))
-                    (fprintf (current-output-port) "~a value after execute func3 is ~a\n" "x" x))]
-           [t1 (thread func1)]
-           [t2 (thread func2)]
-           [t3 (thread func3)]]
-    (begin (thread-wait t1)
-           (thread-wait t2)
-           (thread-wait t3))))
+                    (fprintf (current-output-port) "~a value after execute func3 is ~a\n" "x" x))]]
+    (parallel-execute func1 func2 func3)))
 
 (custodian-shutdown-all cust)
+
+(define (parallel-execute . proc)
+  (for ([p proc])
+    (thread p)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (fuck1) (displayln "fuck1 executing..."))
+(define (fuck2) (displayln "fuck2 executing..."))
+(define (fuck3) (displayln "fuck3 executing..."))
+(for ([p (list fuck1 fuck2 fuck3)])
+  (thread p)) ;;; 但使用 thread 而不是直接执行 (p) 时，3个fuck将会随即同步执行而不是线性执行
