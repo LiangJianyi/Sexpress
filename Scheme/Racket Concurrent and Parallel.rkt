@@ -107,17 +107,29 @@
                     (fprintf (current-output-port) "~a value before execute func3 is ~a\n" "x" x)
                     (set! x (+ x 0.2222))
                     (fprintf (current-output-port) "~a value after execute func3 is ~a\n" "x" x))]]
-    (parallel-execute func1 func2 func3)))
+    (synchronous-execute func1 func2 func3)))
 
 (custodian-shutdown-all cust)
 
-(define (parallel-execute . proc)
+(define (synchronous-execute . proc)
   (for ([p proc])
-    (thread p)))
+    (thread p))) ;;; 使用 thread 而不是直接执行 (p) 时,3个fuck将会随机同步执行而不是线性执行
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define (fuck1) (displayln "fuck1 executing..."))
-(define (fuck2) (displayln "fuck2 executing..."))
-(define (fuck3) (displayln "fuck3 executing..."))
-(for ([p (list fuck1 fuck2 fuck3)])
-  (thread p)) ;;; 但使用 thread 而不是直接执行 (p) 时，3个fuck将会随即同步执行而不是线性执行
+(require "Serializer.rkt")
+(define (fuck1)
+  (displayln "fuck1 executing...")
+  (do []
+    ([= (random -9999999 9999999) 1] [displayln "fuck1 result is 1"])))
+(define (fuck2)
+  (displayln "fuck2 executing...")
+  (do []
+    ([= (random -9999999 9999999) 2] [displayln "fuck2 result is 2"])))
+(define (fuck3)
+  (displayln "fuck3 executing...")
+  (do []
+    ([= (random -9999999 9999999) 3] [displayln "fuck3 result is 3"])))
+(define s (make-serializer))
+(parallel-execute (s fuck1)
+                  (s fuck2)
+                  (s fuck3))
