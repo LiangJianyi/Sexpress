@@ -120,16 +120,18 @@
 (define (fuck1)
   (displayln "fuck1 executing...")
   (do []
-    ([= (random -9999999 9999999) 1] [displayln "fuck1 result is 1"])))
+    ([= (random -999999 999999) 1] [displayln "fuck1 result is 1"])))
 (define (fuck2)
   (displayln "fuck2 executing...")
   (do []
-    ([= (random -9999999 9999999) 2] [displayln "fuck2 result is 2"])))
+    ([= (random -999999 999999) 2] [displayln "fuck2 result is 2"])))
 (define (fuck3)
   (displayln "fuck3 executing...")
   (do []
-    ([= (random -9999999 9999999) 3] [displayln "fuck3 result is 3"])))
+    ([= (random -999999 999999) 3] [displayln "fuck3 result is 3"])))
 (define s (make-serializer))
 (parallel-execute (s fuck1)
                   (s fuck2)
                   (s fuck3))
+
+'-------------------------
