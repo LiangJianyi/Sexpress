@@ -16,24 +16,38 @@
   (define current-index 0)
   (define (the-lock index)
     (cond [[> index current-index]
-           (the-lock)]
+           (the-lock index)]
           [[= index current-index]
+           (set! current-index (+ current-index 1))
            'execute]
           [[< index current-index]
            'release]))
   the-lock)
 
 (define (make-task-constructor)
-  (letrec [[current-index -1]
+  (letrec [[procedure-index-increment -1]
            [lock (make-lock)]]
     (lambda (thunk)
-      (set! current-index (+ current-index 1))
+      (set! procedure-index-increment (+ procedure-index-increment 1))
+      (define index procedure-index-increment)
       (lambda ()
-        (when [eq? 'execute (lock current-index)]
+        (when [eq? 'execute (lock index)]
           (thunk))
-        (lock current-index)))))
+        ;(lock procedure-index-increment)
+        ;(displayln index)
+        ))))
+
+(define (async-order-execute . proc)
+  (for ([p proc])
+    (thread p)))
 
 (define make-task (make-task-constructor))
+;(async-order-execute (make-task fuck1)
+;                     (make-task fuck2)
+;                     (make-task fuck3))
 (define task1 (make-task fuck1))
 (define task2 (make-task fuck2))
 (define task3 (make-task fuck3))
+(async-order-execute task1
+                     task2
+                     task3)
