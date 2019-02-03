@@ -38,7 +38,7 @@
         ;(displayln index)
         ))))
 
-(define (async-order-execute . proc)
+(define (order-execute . proc)
   (for ([p proc])
     (thread p)))
 
@@ -49,6 +49,6 @@
 (define task1 (make-task fuck1))
 (define task2 (make-task fuck2))
 (define task3 (make-task fuck3))
-(async-order-execute task1
+(order-execute task1
                      task2
                      task3)
