@@ -14,7 +14,7 @@
 
 (define (make-lock)
   (define current-index 0)
-  (define (the-lock index)
+  (define (the-lock index thread)
     (cond [[> index current-index]
            (the-lock index)]
           [[= index current-index]
@@ -31,7 +31,7 @@
       (set! procedure-index-increment (+ procedure-index-increment 1))
       (define index procedure-index-increment)
       (lambda ()
-        (when [eq? 'execute (lock index)]
+        (when [eq? 'execute (lock index (current-thread))]
           (thunk))
         ;(lock procedure-index-increment)
         ;(displayln index)
