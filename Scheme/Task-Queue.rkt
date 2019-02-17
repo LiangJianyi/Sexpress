@@ -33,19 +33,13 @@
       (lambda ()
         (when [eq? 'execute (lock index)]
           (thunk)
-          (lock -1))
-        ;(lock procedure-index-increment)
-        ;(displayln index)
-        ))))
+          (lock -1))))))
 
 (define (order-execute . proc)
   (for ([p proc])
     (thread p)))
 
 (define make-task (make-task-constructor))
-;(async-order-execute (make-task fuck1)
-;                     (make-task fuck2)
-;                     (make-task fuck3))
 (define task1 (make-task fuck1))
 (define task2 (make-task fuck2))
 (define task3 (make-task fuck3))
