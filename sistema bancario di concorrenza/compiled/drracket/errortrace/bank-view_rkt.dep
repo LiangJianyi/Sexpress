@@ -1,0 +1,1 @@
+("7.1" ("62076659a0b804ca06ffd9cf5a727c0da7adb965" . "a0909d92f178f8cff5c1bdfce081a5e9085965b6") #"/Users/liangjianyi/Documents/GitHub/Sexpress/sistema bancario di concorrenza/../../JanyeeParallel/Serializer.rkt" (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))
