@@ -1,6 +1,7 @@
 #lang racket
 (provide make-account)
 (provide make-account-and-serializer)
+(provide make-account-and-serializer-2)
 (require "../../JanyeeParallel/Serializer.rkt")
 
 ;; Two main organizational strategies: object based and
@@ -45,6 +46,31 @@
             ((eq? m 'serializer) balance-serializer)
             (else (error "Unknown request -- MAKE-ACCOUNT" m))))
     dispatch))
+
+(define (make-account-and-serializer-2 balance)
+  (define (withdraw amount)
+    (displayln "Initial withdraw")
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficient funds"))
+  (define (deposit amount)
+    (displayln "Initial deposit")
+    (set! balance (+ balance amount))
+    balance)
+  (let ((serializer (make-serializer)))
+    (displayln "make-serializer")
+    (let ((serializer-withdraw (serializer withdraw))
+          (serializer-deposit (serializer deposit)))
+      (displayln "Execute (serializer withdraw) and (serializer deposit)")
+      (define (dispatch m)
+        (displayln "Initial dispatch")
+        (cond ((eq? m 'withdraw) serializer-withdraw)
+              ((eq? m 'deposit) serializer-deposit)
+              ((eq? m 'balance) balance)
+              ((eq? m 'serializer) serializer)
+              (else (error "Unknown request -- MAKE-ACCOUNT" m))))
+      dispatch)))
 
 ;; Rewriting withdraw to encapsulate the balance
 (define new-withdraw
