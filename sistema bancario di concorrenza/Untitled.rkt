@@ -1,6 +1,51 @@
 #lang racket
+(require compatibility/mlist)
 (require "./bank-view.rkt")
-(require "../../JanyeeParallel/Serializer.rkt")
+;(require "../../JanyeeParallel/Serializer.rkt")
+
+(define (parallel-execute . proc)
+  (define thd-lst null)
+  (for ([p proc])
+    (if [eq? thd-lst null]
+        (set! thd-lst (list (thread p)))
+        (set! thd-lst (append thd-lst (list (thread p))))))
+  thd-lst)
+
+(define (make-serializer debug-mode)
+  (let ((mutex (make-mutex)))
+    (lambda (p)
+      (define (serialized-p . args)
+        (mutex 'acquire)
+        (when [eq? debug-mode #t]
+            (begin
+              (fprintf (current-output-port) "mutex of ~a: ~a\n" args (mutex 'display)) ;test
+              (set! args null) ;test
+        ))
+        (let ((val (apply p args)))
+          (mutex 'release)
+          val))
+      serialized-p)))
+
+(define (make-mutex)
+  (let ((cell (mlist false)))
+    (define (the-mutex m)
+      (cond ((eq? m 'acquire)
+             ;; true if already set, false once set
+             (if (test-and-set! cell) 
+                 (the-mutex 'acquire) ;; retry, causing "blocking"
+                 false))
+            ((eq? m 'display) (mcar cell)) ;test
+            ((eq? m 'release) (clear! cell))))
+    the-mutex))
+
+(define (clear! cell)
+  (set-mcar! cell false))
+
+(define (test-and-set! cell)
+  (if (mcar cell)
+      true
+      (begin (set-mcar! cell true)
+             false)))
 
 (define acc1 (make-account 100))
 ;(define acc2 (make-account 39.4))
@@ -22,27 +67,38 @@
 
 (define parallel1 (lambda ()
                     (displayln "Executing parallel1")
-                    (parallel-execute (lambda () (while-away deposit-exe-20))
-                                      (lambda () (while-away withdraw-exe-80)))))
+                    (define serializer (make-serializer #f))
+                    (define thd-lst (parallel-execute (serializer (lambda () (while-away deposit-exe-20)))
+                                                      (serializer (lambda () (while-away withdraw-exe-80)))))
+                    (for ([thd thd-lst])
+                      (thread-wait thd))))
 
 (define parallel2 (lambda ()
                     (displayln "Executing parallel2")
-                    (parallel-execute (lambda () (while-away deposit-exe-20))
-                                      (lambda () (while-away withdraw-exe-80)))))
+                    (define serializer (make-serializer #f))
+                    (define thd-lst (parallel-execute (serializer (lambda () (while-away deposit-exe-20)))
+                                                      (serializer (lambda () (while-away withdraw-exe-80)))))
+                    (for ([thd thd-lst])
+                      (thread-wait thd))))
 
 (define parallel3 (lambda ()
                     (displayln "Executing parallel3")
-                    (parallel-execute (lambda () (while-away deposit-exe-20))
-                                      (lambda () (while-away withdraw-exe-80)))))
+                    (define serializer (make-serializer #f))
+                    (define thd-lst (parallel-execute (serializer (lambda () (while-away deposit-exe-20)))
+                                                      (serializer (lambda () (while-away withdraw-exe-80)))))
+                    (for ([thd thd-lst])
+                      (thread-wait thd))))
 
-(define serializer (make-serializer))
+(define serializer (make-serializer #t))
 (define serialize-parallel1 (serializer parallel1))
 (define serialize-parallel2 (serializer parallel2))
 (define serialize-parallel3 (serializer parallel3))
 
-(define thd-lst (parallel-execute serialize-parallel1
-                  serialize-parallel2
-                  serialize-parallel3))
-(for ([thd thd-lst])
-  (thread-wait thd))
+(define (run)
+  (define thd-lst (parallel-execute (lambda () (serialize-parallel1 "parallel1"))
+                                    (lambda () (serialize-parallel2 "parallel2"))
+                                    (lambda () (serialize-parallel3 "parallel3"))))
+  (for ([thd thd-lst])
+    (thread-wait thd)))
 
+(run)
