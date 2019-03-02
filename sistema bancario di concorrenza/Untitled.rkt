@@ -18,11 +18,16 @@
         (mutex 'acquire)
         (when [eq? debug-mode #t]
             (begin
-              (fprintf (current-output-port) "mutex of ~a: ~a\n" args (mutex 'display)) ;test
+              (fprintf (current-output-port) "(mutex 'acquire): ~a in ~a\n" (mutex 'display) args) ;test
               (set! args null) ;test
         ))
         (let ((val (apply p args)))
           (mutex 'release)
+          (when [eq? debug-mode #t]
+            (begin
+              (fprintf (current-output-port) "(mutex 'release): ~a in ~a\n" (mutex 'display) args) ;test
+              (set! args null) ;test
+              ))
           val))
       serialized-p)))
 
