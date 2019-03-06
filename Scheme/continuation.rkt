@@ -81,3 +81,13 @@
       (e (+ 1 (k)))))))
 (continuation 12345)
 (continuation 666)
+(continuation '----------------------)
+
+(define x (call/cc
+           (lambda (k)
+             (set! continuation k)
+             (k "hello world")
+             (k "fuck you"))))
+x
+(displayln x)
+(continuation "Yalo")
