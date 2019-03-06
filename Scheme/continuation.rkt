@@ -42,6 +42,7 @@
                                   (let
                                       ([x (c not-ok)])
                                     (ok x))))])
+               ;(displayln err)
                (h err)))))
 
 ;division 
@@ -64,3 +65,19 @@
              (set! continuation k)
              (k 3)))))
 (continuation 10)
+(call/cc (lambda (k)
+           (set! continuation k)
+           (displayln "Initial continuation")))
+(continuation 10)
+(continuation "hehe....")
+(continuation 101010101)
+(continuation '----------------------)
+
+(call/cc
+ (lambda (e)
+   (call/cc
+    (lambda (k)
+      (set! continuation k)
+      (e (+ 1 (k)))))))
+(continuation 12345)
+(continuation 666)
