@@ -58,4 +58,9 @@
                        (k "fuck"))))
 (displayln err)
 
-(+ 1 (+ 2 (call/cc (lambda (k) (k 3)))))
+(define continuation null)
+(+ 1 (+ 2 (call/cc
+           (lambda (k)
+             (set! continuation k)
+             (k 3)))))
+(continuation 10)
