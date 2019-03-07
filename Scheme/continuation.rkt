@@ -95,7 +95,7 @@ x
 ((lambda (e)
    (call/cc
     (lambda (k)
-      (e (+ 1 (k "I 'dont know."))))))
+      (e (+ 1 (k "I 'dont know." "Where I am?" #\f #\u #\c #\k))))))
  displayln)
 
 (+ 1
@@ -109,3 +109,5 @@ x
    (set! continuation k)
    (+ -21 -1)))
 (continuation 0 100000 "Content: " #\f #\u #\c #\k)
+
+(* 3 (call/cc (lambda (k) (+ 1 (k 99)))))
