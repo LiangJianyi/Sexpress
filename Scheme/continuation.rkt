@@ -90,4 +90,22 @@
              (k "fuck you"))))
 x
 (displayln x)
-(continuation "Yalo")
+'----------------------
+
+((lambda (e)
+   (call/cc
+    (lambda (k)
+      (e (+ 1 (k "I 'dont know."))))))
+ displayln)
+
+(+ 1
+   (+ [call/cc (lambda (k) (k 93))]
+      (+ 2 4)))
+
+'----------------------
+
+(call/cc
+ (lambda (k)
+   (set! continuation k)
+   (+ -21 -1)))
+(continuation 0 100000 "Content: " #\f #\u #\c #\k)
