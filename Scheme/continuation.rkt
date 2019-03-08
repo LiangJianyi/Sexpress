@@ -111,3 +111,20 @@ x
 (continuation 0 100000 "Content: " #\f #\u #\c #\k)
 
 (* 3 (call/cc (lambda (k) (+ 1 (k 99)))))
+
+'----------------------
+
+(define forzen null)
+(append ((lambda ()
+           (displayln "append (list 'the 'call/cc 'returned)")
+           (list 'the 'call/cc 'returned)))
+        ((lambda ()
+           (displayln "create new list")
+           (list ((lambda ()
+                    (displayln "Jump into call/cc")
+                    (call/cc
+                     (lambda (k)
+                       (displayln "(set! forzen k)")
+                       (set! forzen k)
+                       (displayln "return symbol a")
+                       'a))))))))
