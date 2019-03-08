@@ -128,3 +128,9 @@ x
                        (set! forzen k)
                        (displayln "return symbol a")
                        'a))))))))
+
+(displayln "executing (forzen 'again)")
+(forzen 'again)
+(forzen 'again)
+(forzen 'again)
+(forzen 'again)
