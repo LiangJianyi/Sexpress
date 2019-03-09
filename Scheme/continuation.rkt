@@ -158,8 +158,11 @@ x
 
 '----------------------
 
-(call/cc
- (lambda (k)
-   (set! continuation k)))
-(append '(#\a #\b #\c) '(#\d))
+(let ()
+  (call/cc
+   (lambda (k)
+     (set! continuation k)))
+  (append '(#\a #\b #\c) '(#\d)))
 (continuation #\f 3 true)
+(continuation)
+(continuation null null null)
