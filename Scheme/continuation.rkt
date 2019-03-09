@@ -141,16 +141,25 @@ x
 
 (define froz1 null)
 (define froz2 null)
-(let ([x 0])
-  (call/cc
-   (lambda (cc)
-     (set! froz1 cc)
-     (set! froz2 cc)))
-  (set! x (+ 1 x))
-  x)
-(froz1 null)
-(froz2 null)
-(froz1)
-(froz2)
-(froz1 "a" "b" 123)
-(froz2 #\f)
+(define (run)
+  (let ([x 0])
+    (call/cc
+     (lambda (cc)
+       (set! froz1 cc)
+       (set! froz2 cc)))
+    (set! x (+ 1 x))
+    x))
+;(froz1 null)
+;(froz2 null)
+;(froz1)
+;(froz2)
+;(froz1 "a" "b" 123)
+;(froz2 #\f)
+
+'----------------------
+
+(call/cc
+ (lambda (k)
+   (set! continuation k)))
+(append '(#\a #\b #\c) '(#\d))
+(continuation #\f 3 true)
