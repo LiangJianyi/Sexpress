@@ -166,3 +166,24 @@ x
 (continuation #\f 3 true)
 (continuation)
 (continuation null null null)
+
+'----------------------
+
+(let ()
+  (call/cc
+   (lambda (k)
+     (set! continuation k)
+     (append '(#\a #\b #\c) '(#\d)))))
+(continuation #\f 3 true)
+(continuation)
+(continuation null null null)
+
+'----------------------
+
+(define y -1)
+(set! y [+ (call/cc
+            (lambda (k)
+              (set! continuation k)
+              (k 100)))
+           (+ 200 (/ 500 2))])
+(continuation 100)
