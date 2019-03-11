@@ -149,12 +149,12 @@ x
        (set! froz2 cc)))
     (set! x (+ 1 x))
     x))
-;(froz1 null)
-;(froz2 null)
-;(froz1)
-;(froz2)
-;(froz1 "a" "b" 123)
-;(froz2 #\f)
+(froz1 null)
+(froz2 null)
+(froz1)
+(froz2)
+(froz1 "a" "b" 123)
+(froz2 #\f)
 
 '----------------------
 
@@ -186,4 +186,6 @@ x
               (set! continuation k)
               (k 100)))
            (+ 200 (/ 500 2))])
-(continuation 100)
+y
+(continuation 100000000)
+y
